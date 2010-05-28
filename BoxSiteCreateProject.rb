@@ -154,21 +154,23 @@ for index in 1..endnum
   selenium.type "projectName", "project name: #{index} #{prefix} #{getString(5)}"
   selenium.type "projectDescription", "description: #{getString(50)}"
   # upload images and files, be sure to wait for the modal to open
-  selenium.click "//a[matches(@onclick,'openProjectImageDialog')]"
-  until selenium.element? "file1"
-    sleep 1
-  end
-  # upload a random file
-  #selenium.type "file1", "/home/davegoodine/Pictures/hs-1994-02-c-full_jpg.jpg"
-  selenium.type "file1", imageDir + '/' + imageFilenames[rand(imageFilenames.length)]
-  selenium.click "uploadSubmitButton"
-  until selenium.element? "//span[@title='Delete']"
-    sleep 1
+  for i in 1..4
+    selenium.click "//a[matches(@onclick,'openProjectImageDialog')]"
+    selenium.wait_for_element "file1"
+    #until selenium.element? "file1"
+    #  sleep 1
+    #end
+    selenium.type "file1", imageDir + '/' + imageFilenames[rand(imageFilenames.length)]
+    selenium.click "uploadSubmitButton"
+    #until selenium.element? "//span[@title='Delete']"
+    #selenium.wait_for_element "//div[@id='addedImage#{i}']"
+    until selenium.element? "//div[@id='addedImage#{i}']"
+      sleep 1
+    end
   end
   selenium.click "link=Select up to 4 categories"
   selenium.wait_for_element "catId_1080"
   getRandomArrayElements(allCheckboxIds,4).each do |id|
-#  checkboxIds.each do |id|
     selenium.click id
   end
   selenium.click "//a[@id='Modal_close']/span"
@@ -181,6 +183,7 @@ for index in 1..endnum
   selenium.type "instruction1", "instruction body: #{getString(100)}"
   puts "saving project #{index}"
   selenium.click "link=Save and Publish"
+  selenium.wait_for_page_to_load "30000"
   for i in 1..10
     if selenium.element? "link=Unpublish"
       break
