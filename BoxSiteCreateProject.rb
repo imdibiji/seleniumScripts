@@ -4,6 +4,18 @@ require "getoptlong"
 require 'webster'
 
 # some helper functions
+# get list of image files in a directory
+def getImageFilenames(directoryName, extension)
+  #create and instance of Dir and then collect image filenames, return as array of strings
+  images = []
+  directory = Dir.new(directoryName)
+  regExpression = Regexp.new('.+\.' + extension + '$')
+  directory.each do |file|
+    images.push(file) if file =~ regExpression
+  end
+  return images
+end
+
 # use some js to get all the checkbox ids
 def getAllCheckboxIds(seleniumObject)
   script = "var inputId  = new Array();"# Create array in java script.
@@ -58,6 +70,7 @@ startnum = 0
 endnum = 0
 emailaddress = "foo@bar.com"
 password = "password"
+imageDir = '/home/davegoodine/Pictures'
 
 # process command line options
 opts = GetoptLong.new(
@@ -128,11 +141,9 @@ selenium.wait_for_page_to_load "30000"
 selenium.click "link=Select up to 4 categories"
 selenium.wait_for_element "catId_1080"
 allCheckboxIds =  getAllCheckboxIds(selenium)
-#checkboxIds = []
-#until checkboxIds.length == 4
-#  randomId = allCheckboxIds[rand(allCheckboxIds.length)]
-##  checkboxIds.push(randomId) unless checkboxIds.include?(randomId) 
-#end
+
+# get the list of image files
+imageFilenames = getImageFilenames(imageDir, 'jpg')
 
 # create projects main loop
 for index in 1..endnum
@@ -142,12 +153,14 @@ for index in 1..endnum
   selenium.wait_for_element "projectName"
   selenium.type "projectName", "project name: #{index} #{prefix} #{getString(5)}"
   selenium.type "projectDescription", "description: #{getString(50)}"
-  # upload images and files
+  # upload images and files, be sure to wait for the modal to open
   selenium.click "//a[matches(@onclick,'openProjectImageDialog')]"
   until selenium.element? "file1"
     sleep 1
   end
-  selenium.type "file1", "/home/davegoodine/Pictures/hs-1994-02-c-full_jpg.jpg"
+  # upload a random file
+  #selenium.type "file1", "/home/davegoodine/Pictures/hs-1994-02-c-full_jpg.jpg"
+  selenium.type "file1", imageDir + '/' + imageFilenames[rand(imageFilenames.length)]
   selenium.click "uploadSubmitButton"
   until selenium.element? "//span[@title='Delete']"
     sleep 1
