@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://appcert01-rons.eng.powered.com:8075/" />
+<title>BoxSiteCreateUser</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">BoxSiteCreateUser</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/register</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>email</td>
+	<td>qa51@powered.com</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>nameFirst</td>
+	<td>qa51firstname</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>nameLast</td>
+	<td>qa51lastname</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>countryId</td>
+	<td>label=Anguilla</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>postalCode</td>
+	<td>postcodeqa51</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>streetLine1</td>
+	<td>addressqa51</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>city</td>
+	<td>qa51city</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>phoneNumber</td>
+	<td>qa51phone</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>username</td>
+	<td>qa51username</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>password</td>
+	<td>password</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>passwordConfirm</td>
+	<td>password</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>valueId.1100</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>genderMale</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Submit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Logout</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
