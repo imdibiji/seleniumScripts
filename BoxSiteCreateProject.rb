@@ -71,6 +71,8 @@ endnum = 0
 emailaddress = "foo@bar.com"
 password = "password"
 imageDir = '/home/davegoodine/Pictures'
+numOfMaterials = 4
+numOfInstructions = 4
 
 # process command line options
 opts = GetoptLong.new(
@@ -157,13 +159,9 @@ for index in 1..endnum
   for i in 1..4
     selenium.click "//a[matches(@onclick,'openProjectImageDialog')]"
     selenium.wait_for_element "file1"
-    #until selenium.element? "file1"
-    #  sleep 1
-    #end
     selenium.type "file1", imageDir + '/' + imageFilenames[rand(imageFilenames.length)]
     selenium.click "uploadSubmitButton"
-    #until selenium.element? "//span[@title='Delete']"
-    #selenium.wait_for_element "//div[@id='addedImage#{i}']"
+    # dunno why, but wait_for_element doesn't work here...
     until selenium.element? "//div[@id='addedImage#{i}']"
       sleep 1
     end
@@ -178,12 +176,23 @@ for index in 1..endnum
   selenium.type "hours", rand(5)
   selenium.type "minutes", "15"
   selenium.select "skillLevel", "label=Learning"
-  selenium.type "material1", "material: #{getString(10).slice(0,128)}"
-  selenium.type "instructionTitle1", "instruction title: #{getString(5).slice(0,64)}"
-  selenium.type "instruction1", "instruction body: #{getString(100)}"
+  # materials
+  for i in 1..numOfMaterials
+    selenium.wait_for_element "material#{i}"
+    selenium.type "material#{i}", "material #{i}: #{getString(10).slice(0,128)}"
+    selenium.click "//a[@href='javascript:projectControl.addNewMaterial();']" unless i == numOfMaterials
+  end
+  # instructions
+  for i in 1..numOfInstructions
+    selenium.wait_for_element "instructionTitle#{i}"
+    selenium.type "instructionTitle#{i}", "instruction title: #{getString(5).slice(0,64)}"
+    selenium.type "instruction#{i}", "instruction body: #{getString(100)}"
+    selenium.click "//a[@href='javascript:projectControl.addNewInstruction();']" unless i == numOfInstructions
+  end
+  # save
   puts "saving project #{index}"
   selenium.click "link=Save and Publish"
-  selenium.wait_for_page_to_load "30000"
+  selenium.wait_for_page_to_load "10"
   for i in 1..10
     if selenium.element? "link=Unpublish"
       break
