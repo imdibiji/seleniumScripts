@@ -18,7 +18,6 @@ prefix = 'qa'
 endnum = 0
 emailaddress = "foo@bar.com"
 password = "password"
-#categories = ['Questions','Announcements','Random Talk','Getting Started']
 categories = ['Questions','Random Talk','Getting Started']
 
 # process command line options
@@ -63,6 +62,7 @@ end
 # create instance of selenium client
 selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", "http://appcert01-rons.eng.powered.com:8075/", 10000);
 selenium.start
+selenium.allow_native_xpath("false")
 selenium.set_context("test_box_site_post_topic")
 
 # go home and logout if necessary.  Then login.
@@ -89,15 +89,13 @@ end
 puts endnum
 (1..endnum).each do |index|
 #for index in 1..endnum
-  selenium.open "/discussions/home"
-  selenium.click "link=Talking"
+  selenium.click "xpath=//a[matches(@href,'/discussions/home')]"
   selenium.wait_for_page_to_load "30000"
-  selenium.click "link=Start talking"
+  selenium.click "xpath=//a[matches(@href,'/discussions/new')]"
   selenium.wait_for_page_to_load "30000"
   puts "posting topic: #{Time.now}: #{prefix} : #{index}"
   selenium.type "topicTitle", "#{Time.now}: #{prefix} : #{index} #{getString(3)}"
   selenium.select "Category", "label=#{categories[rand(categories.length)]}"
-#  selenium.type "editorArea", "#{index}: this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body."
   selenium.type "editorArea", getString(100)
   selenium.click "MessageBoardSubscribe"
   selenium.click "link=Post"
