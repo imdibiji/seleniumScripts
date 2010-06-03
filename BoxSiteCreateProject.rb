@@ -73,6 +73,7 @@ password = "password"
 imageDir = '/home/davegoodine/Pictures'
 numOfMaterials = 4
 numOfInstructions = 4
+numOfInstructionImages = 3
 
 # process command line options
 opts = GetoptLong.new(
@@ -183,6 +184,19 @@ for index in 1..endnum
     selenium.click "//a[@href='javascript:projectControl.addNewMaterial();']" unless i == numOfMaterials
   end
   # instructions
+  for imageIndex in 1..numOfInstructionImages
+    selenium.wait_for_element "//a[matches(text(),'Add Instruction Photo')]"
+    sleep 2 # frack!
+    selenium.click "//a[matches(text(),'Add Instruction Photo')]"
+    selenium.wait_for_element "//input[@id='file1'][@class='File Modal_focusable']"
+    selenium.wait_for_element "//a[matches(@onclick, 'cancelUploadDialog')]"
+    selenium.type "file1", imageDir + '/' + imageFilenames[rand(imageFilenames.length)]
+    selenium.click "uploadSubmitButton"
+    # dunno why, but wait_for_element doesn't work here...
+    until selenium.element? "//div[@id='addedImage#{imageIndex}'][@class='projectImageThumbnail']"
+      sleep 1
+    end
+  end
   for i in 1..numOfInstructions
     selenium.wait_for_element "instructionTitle#{i}"
     selenium.type "instructionTitle#{i}", "instruction title: #{getString(5).slice(0,64)}"
@@ -192,12 +206,13 @@ for index in 1..endnum
   # save
   puts "saving project #{index}"
   selenium.click "link=Save and Publish"
-  selenium.wait_for_page_to_load "10"
+  # wait up to 10 sec for save to complete
   for i in 1..10
     if selenium.element? "link=Unpublish"
       break
-    elsif selenium.text? "The following errors must be corrected before saving your project"
-      puts "got a bad word, break"
+    elsif selenium.element? "//div[@class='error'][@id='Notifier']"
+    #elsif selenium.text? "The following errors must be corrected before saving your project"
+      puts "There was an error during save, break."
       break
     end 
     sleep 1 
