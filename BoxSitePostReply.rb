@@ -1,6 +1,8 @@
 require 'rubygems'
 require "selenium"
 require "getoptlong"
+require 'BoxSiteHelperModule.rb'
+include BoxSiteHelperModule
 
 # init
 prefix = 'qa'
@@ -47,11 +49,13 @@ begin
     when "--password"
       password = arg
     else
-      puts 'Usage: -c list of clients
-   -e environment
-   -R Resume previous run
-   -n Skip registration of new user before spidering registration
-e.g. ruby start_watir_spider.rb -c sony, motorola -e QA, ClientQA '
+      puts 'Usage: -p <prefix to use>
+       -t topic id
+       -s starting index
+       -e ending index
+       -a email address to login with
+       -P passowrd
+      e.g. ruby $0 -p "this is a test" -s 1 -e 10 -a qa42@powered.com -P password'
       Process.exit!
     end
   }
@@ -62,7 +66,7 @@ selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", "http://ap
 # don't use native xpath cuz FF is teh weak
 selenium.start
 selenium.allow_native_xpath("false")
-selenium.set_context("test_box_site_post_topic")
+selenium.set_context("test_box_site_post_reply")
 
 # go home and logout if necessary.  Then login.
 selenium.open "/"
@@ -101,7 +105,8 @@ for index in startnum..endnum
   end
 
   selenium.wait_for_page_to_load "300"
-  selenium.type "editorArea", "#{Time.now}: #{prefix} : #{index}\nThis is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body."
+#  selenium.type "editorArea", "#{Time.now}: #{prefix} : #{index}\nThis is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body.  this is the body."
+  selenium.type "editorArea", "#{Time.now}: #{prefix} : #{index}\n #{getString(30)}"
   puts "posting reply index: #{index}"
   selenium.click "link=Post"
   selenium.wait_for_page_to_load "30000"
