@@ -1,67 +1,8 @@
 require 'rubygems'
 require "selenium"
 require "getoptlong"
-require 'webster'
-
-# some helper functions
-# get list of image files in a directory
-def getImageFilenames(directoryName, extension)
-  #create and instance of Dir and then collect image filenames, return as array of strings
-  images = []
-  directory = Dir.new(directoryName)
-  regExpression = Regexp.new('.+\.' + extension + '$')
-  directory.each do |file|
-    images.push(file) if file =~ regExpression
-  end
-  return images
-end
-
-# use some js to get all the checkbox ids
-def getAllCheckboxIds(seleniumObject)
-  script = "var inputId  = new Array();"# Create array in java script.
-  script += "var cnt = 0;" # Counter for check box ids.
-  script += "var inputFields  = new Array();" # Create array in java script.
-  script += "inputFields = window.document.getElementsByTagName('input');" # Collect input elements.
-  script += "for(var i=0; i<inputFields.length; i++) {" # Loop through the collected elements.
-  script += "if(inputFields[i].id !=null "
-  script += "&& inputFields[i].id !='undefined' "
-  script += "&& inputFields[i].getAttribute('type') == 'checkbox') {" # If input field is of type check box and input id is not null.
-  script += "inputId[cnt]=inputFields[i].id ;" # Save check box id to inputId array.
-  script += "cnt++;" # increment the counter.
-  script += "}" # end of if.
-  script += "}" # end of for.
-  script += "inputId.toString();" # Convert array in to string.
-  checkboxIds = seleniumObject.get_eval(script).split(",") # Split the string.
-  return checkboxIds
-end
-
-def getString(numberOfWords)
-  wordGenerator = Webster.new
-  words = ''
-  for i in 1..numberOfWords
-    words += "#{wordGenerator.random_word} "
-  end
-  return words
-end
-
-def getCommaString(numberOfWords)
-  wordGenerator = Webster.new
-  words = ''
-  for i in 1..numberOfWords
-    words += "#{wordGenerator.random_word},"
-  end
-  return words.chop!
-end
-
-def getRandomArrayElements(theArray, numberOfElements)
-  #returns random elements
-  randomElements = []
-  until randomElements.length == numberOfElements
-    randomElement = theArray[rand(theArray.length)]
-    randomElements.push(randomElement) unless randomElements.include?(randomElement) 
-  end
-  return randomElements
-end
+require 'BoxSiteHelperModule.rb'
+include BoxSiteHelperModule
 
 # init
 prefix = 'qa'
@@ -149,12 +90,13 @@ allCheckboxIds =  getAllCheckboxIds(selenium)
 imageFilenames = getImageFilenames(imageDir, 'jpg')
 
 # create projects main loop
+time = Time.new
 for index in 1..endnum
   puts "creating project #{index}..."
   selenium.open "/projects/new"
   selenium.wait_for_page_to_load "30000"
   selenium.wait_for_element "projectName"
-  selenium.type "projectName", "project name: #{index} #{prefix} #{getString(5)}"
+  selenium.type "projectName", "project name: #{time.month}-#{time.day}-#{time.year} #{time.hour}:#{time.min}:#{time.sec} #{index} #{prefix} #{getString(5)}"
   selenium.type "projectDescription", "description: #{getString(50)}"
   # upload images and files, be sure to wait for the modal to open
   for i in 1..4
