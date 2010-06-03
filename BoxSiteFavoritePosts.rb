@@ -1,43 +1,8 @@
 require 'rubygems'
 require "selenium"
 require "getoptlong"
-
-# functions
-def isTopicHref(href)
-  topicHrefPattern = Regexp.new('\/discussions\/\d+')
-  if href =~ topicHrefPattern 
-    return true
-  else
-    return false
-  end
-end
-
-def isPagerLink(href)
-  topicHrefPattern = Regexp.new('\/discussions\/.+&page=\d')
-  if href =~ topicHrefPattern 
-    return true
-  else
-    return false
-  end
-end
-
-def getPageNumber(href)
-  topicHrefPattern = Regexp.new('\/discussions\/.+&page=(\d+)')
-  if href =~ topicHrefPattern 
-    return $1.to_i
-  else
-    return false
-  end
-end
-
-def getTopicId(href)
-  topicHrefPattern = Regexp.new('\/discussions\/(\d+)')
-  if href =~ topicHrefPattern 
-    return $1.to_i
-  else
-    return false
-  end
-end
+require 'BoxSiteHelperModule.rb'
+include BoxSiteHelperModule
 
 # init
 emailaddress = "foo@bar.com"
