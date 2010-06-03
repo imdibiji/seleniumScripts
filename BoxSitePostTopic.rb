@@ -1,17 +1,8 @@
 require 'rubygems'
 require "selenium"
 require "getoptlong"
-require 'webster'
-
-# some helper functions
-def getString(numberOfWords)
-  wordGenerator = Webster.new
-  words = ''
-  for i in 1..numberOfWords
-    words += "#{wordGenerator.random_word} "
-  end
-  return words
-end
+require 'BoxSiteHelperModule.rb'
+include BoxSiteHelperModule
 
 # init
 prefix = 'qa'
