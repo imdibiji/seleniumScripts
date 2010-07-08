@@ -96,8 +96,10 @@ end
 # view each topic and favorit it
 topicHrefs.each do |href|
   selenium.open(href)
-  if selenium.element? "//div[@class=\"userFavoriteImage\"]" 
-    selenium.click "//div[@class=\"userFavoriteImage\"]"
+  if selenium.element? "//div[@class=\"userFavoriteImage \"]" 
+    selenium.click "//div[@class=\"userFavoriteImage \"]"
+  else
+    puts "could not favorite #{href}"
   end
 end
 
