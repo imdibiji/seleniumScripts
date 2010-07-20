@@ -13,7 +13,7 @@ endnum = 0
 opts = GetoptLong.new(
     [ "--prefix", "-p", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--startnum", "-s", GetoptLong::REQUIRED_ARGUMENT ],
-    [ "--endnum", "-e", GetoptLong::OPTIONAL_ARGUMENT ]
+    [ "--endnum", "-e", GetoptLong::REQUIRED_ARGUMENT ]
 )
 
 begin
@@ -22,9 +22,9 @@ begin
     when "--prefix"
       prefix = arg
     when "--startnum"
-      startnum = arg
+      startnum = arg.to_i
     when "--endnum"
-      endnum = arg
+      endnum = arg.to_i
     else
       puts 'Usage: -c list of clients
    -e environment
@@ -37,7 +37,7 @@ e.g. ruby start_watir_spider.rb -c sony, motorola -e QA, ClientQA '
 end
 
 # create instance of selenium client
-selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", "http://appcert01-rons.eng.powered.com:8075/", 10000);
+selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", "http://appcert01-sony.eng.powered.com:8072/", 10000);
 selenium.start
 selenium.set_context("test_box_site_create_user")
 
@@ -61,7 +61,6 @@ for index in startnum..endnum
   selenium.check "attributeValueId1001"
   selenium.check "attributeValueId1006"
   selenium.check "attributeValueId1007"
-  #selenium.select "countryId", "label=Anguilla"
   selenium.select "attribute.1002","label=Friend"
   selenium.click "userAttribute1003"
   selenium.type "attribute.1004", "#{prefix}#{index} street 1"
@@ -72,7 +71,8 @@ for index in startnum..endnum
   selenium.select "attribute.1009","label=Bahamas"
   selenium.type "attribute.1010","#{prefix}#{index} maiden name"
   selenium.type "userAttribute1012","#{prefix}#{index} #{getString(50)}"
-  selenium.click "userAttribute1014"
+  selenium.wait_for_element "userAttribute1014"
+  selenium.click "userAttribute1014" unless selenium.checked? "userAttribute1014" 
   selenium.check "attribute.1013Male"
   selenium.click "//input[@value='Submit']"
   selenium.wait_for_page_to_load "30"
