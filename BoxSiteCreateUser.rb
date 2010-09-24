@@ -8,17 +8,30 @@ include BoxSiteHelperModule
 prefix = 'qa'
 startnum = 0
 endnum = 0
+starturl = ''
 
 # process command line options
 opts = GetoptLong.new(
+    [ "--url", "-u", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--prefix", "-p", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--startnum", "-s", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--endnum", "-e", GetoptLong::REQUIRED_ARGUMENT ]
 )
 
+unless ARGV.length > 0
+  puts "Usage: -u <start url>
+   -p <prefix>
+   -s <starting index>
+   -e <ending index>
+e.g. ruby #{$0} -u http://www.yahoo.com -p qa -s 1 -e 10 "
+  Process.exit!
+end
+
 begin
   opts.each { |opt, arg|
     case opt
+    when "--url"
+      starturl = arg
     when "--prefix"
       prefix = arg
     when "--startnum"
@@ -26,18 +39,19 @@ begin
     when "--endnum"
       endnum = arg.to_i
     else
-      puts 'Usage: -c list of clients
-   -e environment
-   -R Resume previous run
-   -n Skip registration of new user before spidering registration
-e.g. ruby start_watir_spider.rb -c sony, motorola -e QA, ClientQA '
+      puts "Usage: -u <start url>
+   -p <prefix>
+   -s <starting index>
+   -e <ending index>
+e.g. ruby $0 -u http://www.yahoo.com -p qa -s 1 -e 10 "
       Process.exit!
     end
   }
 end
 
+
 # create instance of selenium client
-selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", "http://appcert01-sony.eng.powered.com:8072/", 10000);
+selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", starturl, 10000);
 selenium.start
 selenium.set_context("test_box_site_create_user")
 
