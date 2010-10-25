@@ -49,31 +49,31 @@ end
 
 # create instance of selenium client
 # hardcoding the host for now
-selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", "http://appcert01-hpms.eng.powered.com:8075/workbench", 10000);
+selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", "http://admcert01-hpms.eng.powered.com:8075/", 10000);
 selenium.start
 selenium.allow_native_xpath("false")
 selenium.set_context("test_workbench_advanced_search")
 
 # go home and logout if necessary.  Then login.
 puts "login"
-selenium.open "/"
+selenium.open "/workbench"
 if selenium.element? "link=Logout"
   selenium.click "link=Logout"
   selenium.wait_for_page_to_load "30"
 end
-selenium.open "/login"
-selenium.wait_for_page_to_load "30000"
-if (selenium.element? "emailAddress") && (selenium.element? "LoginSubmit")
-  selenium.click "emailAddress"
-  selenium.type "emailAddress", emailaddress
+if (selenium.element? "username") && (selenium.element? "login")
+  selenium.click "username"
+  selenium.type "username", emailaddress
   selenium.type "password", password
-  selenium.click "LoginSubmit"
+  selenium.click "login"
   selenium.wait_for_page_to_load "30000"
 else
   puts "could not login!"
   Process.exit!
 end
 
+# open and read the input file with search terms, each line is a set of one or more
+# terms.
 # post a message board topic
 puts endnum
 (1..endnum).each do |index|
