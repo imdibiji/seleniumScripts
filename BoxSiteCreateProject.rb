@@ -5,19 +5,27 @@ require 'BoxSiteHelperModule.rb'
 include BoxSiteHelperModule
 
 # init
+usage = "Usage: -p <prefix to use>
+   -u base url
+   -e ending indexputs 
+   -a email address to login with
+   -P password
+  e.g. ruby #{$0} -p \"this is a test\" -e 10 -a qa42@powered.com -P password"
+url = ''
 prefix = 'qa'
 topicid = 0
 startnum = 0
 endnum = 0
 emailaddress = "foo@bar.com"
 password = "password"
-imageDir = '/home/davegoodine/Pictures'
+imageDir = '/home/dgoodine/src/seleniumScripts/images'
 numOfMaterials = 4
 numOfInstructions = 4
 numOfInstructionImages = 3
 
 # process command line options
 opts = GetoptLong.new(
+    [ "--url", "-u", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--prefix", "-p", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--endnum", "-e", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--emailaddress", "-a", GetoptLong::REQUIRED_ARGUMENT ],
@@ -25,17 +33,15 @@ opts = GetoptLong.new(
 )
 
 unless ARGV.length > 0
-  puts 'Usage: -p <prefix to use>
-   -e ending index
-   -a email address to login with
-   -P passowrd
-  e.g. ruby $0 -p "this is a test" -e 10 -a qa42@powered.com -P password'
+  puts usage
   exit
 end
 
 begin
   opts.each { |opt, arg|
     case opt
+    when "--url"
+      url = arg
     when "--prefix"
       prefix = arg
     when "--endnum"
@@ -45,18 +51,14 @@ begin
     when "--password"
       password = arg
     else
-      puts 'Usage: -p "prefix text"
-   -e endnum
-   -a email address
-   -P password
-  e.g. ruby $0 -p "this is a test" -e 10 -a qa42@powered.com -P password'
+      puts usage
       Process.exit!
     end
   }
 end
 
 # create instance of selenium client
-selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", "http://appcert01-rons.eng.powered.com:8075/", 10000);
+selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", url, 10000);
 selenium.start
 selenium.allow_native_xpath("false")      # don't use native xpath cuz FF is teh weak
 selenium.set_context("test_box_site_create_topic")
@@ -78,6 +80,12 @@ if (selenium.element? "emailAddress") && (selenium.element? "LoginSubmit")
 else
   puts "could not login!"
 end
+#check for successful login
+unless (selenium.element? "Logout")
+  puts "login unsuccessful!"
+  Process.exit!
+end
+
 
 #  get 4 random checkbox ids
 selenium.open "/projects/new"
@@ -114,7 +122,7 @@ for index in 1..endnum
   getRandomArrayElements(allCheckboxIds,4).each do |id|
     selenium.click id
   end
-  selenium.click "//a[@id='Modal_close']/span"
+  selenium.click "link=Select Categories"
   selenium.type "tagString", getCommaString(4)
   selenium.type "hours", rand(5)
   selenium.type "minutes", "15"
