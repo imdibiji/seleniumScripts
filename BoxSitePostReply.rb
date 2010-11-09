@@ -5,15 +5,24 @@ require 'BoxSiteHelperModule.rb'
 include BoxSiteHelperModule
 
 # init
+url = ''
 prefix = 'qa'
 topicid = 0
 startnum = 0
 endnum = 0
 emailaddress = "foo@bar.com"
 password = "password"
+usage = "Usage: -p <prefix to use>
+   -t topic id
+   -s starting index
+   -e ending index
+   -a email address to login with
+   -P password
+  e.g. ruby #{$0} -p \"this is a test\" -s 1 -e 10 -a qa42@powered.com -P password"
 
 # process command line options
 opts = GetoptLong.new(
+    [ "--url", "-u", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--prefix", "-p", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--topicid", "-t", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--startnum", "-s", GetoptLong::REQUIRED_ARGUMENT ],
@@ -23,19 +32,15 @@ opts = GetoptLong.new(
 )
 
 unless ARGV.length > 0
-  puts 'Usage: -p <prefix to use>
-   -t topic id
-   -s starting index
-   -e ending index
-   -a email address to login with
-   -P passowrd
-  e.g. ruby $0 -p "this is a test" -s 1 -e 10 -a qa42@powered.com -P password'
+  puts usage
   exit
 end
 
 begin
   opts.each { |opt, arg|
     case opt
+    when "--url"
+      url = arg
     when "--prefix"
       prefix = arg
     when "--topicid"
@@ -49,20 +54,14 @@ begin
     when "--password"
       password = arg
     else
-      puts 'Usage: -p <prefix to use>
-       -t topic id
-       -s starting index
-       -e ending index
-       -a email address to login with
-       -P passowrd
-      e.g. ruby $0 -p "this is a test" -s 1 -e 10 -a qa42@powered.com -P password'
+      puts usage
       Process.exit!
     end
   }
 end
 
 # create instance of selenium client
-selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", "http://appcert01-rons.eng.powered.com:8075/", 10000);
+selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", url, 10000);
 # don't use native xpath cuz FF is teh weak
 selenium.start
 selenium.allow_native_xpath("false")
@@ -83,7 +82,13 @@ if (selenium.element? "emailAddress") && (selenium.element? "LoginSubmit")
   selenium.click "LoginSubmit"
   selenium.wait_for_page_to_load "30000"
 else
-  puts "could not login!"
+  puts "could not find login fields!"
+end
+
+#check for successful login
+unless (selenium.element? "Logout")
+  puts "login unsuccessful!"
+  Process.exit!
 end
 
 # select a topic and post some replies
