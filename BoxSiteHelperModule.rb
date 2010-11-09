@@ -4,6 +4,23 @@ require 'webster'
 module BoxSiteHelperModule
   # some helper functions
 
+  # get login
+  def loginFrontendUser(seleniumObject, email, password)
+    seleniumObject.open "/login"
+    seleniumObject.wait_for_page_to_load "30000"
+    if (seleniumObject.element? "emailAddress") && (seleniumObject.element? "LoginSubmit")
+      seleniumObject.click "emailAddress"
+      seleniumObject.type "emailAddress", email
+      seleniumObject.type "password", password
+      seleniumObject.click "LoginSubmit"
+      seleniumObject.wait_for_page_to_load "30000"
+    else
+        puts "could not find login fields!"
+        Process.exit!
+    end
+  end
+
+ 
   # get list of image files in a directory
   def getImageFilenames(directoryName, extension)
     #create and instance of Dir and then collect image filenames, return as array of strings
