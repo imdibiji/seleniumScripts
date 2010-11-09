@@ -3,6 +3,7 @@ require 'webster'
 
 module BoxSiteHelperModule
   # some helper functions
+
   # get list of image files in a directory
   def getImageFilenames(directoryName, extension)
     #create and instance of Dir and then collect image filenames, return as array of strings
