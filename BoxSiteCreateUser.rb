@@ -5,6 +5,11 @@ require 'BoxSiteHelperModule.rb'
 include BoxSiteHelperModule
 
 # init
+usage = "Usage: -u <start url>
+   -p <prefix>
+   -s <starting index>
+   -e <ending index>
+e.g. ruby #{$0} -u http://www.yahoo.com -p qa -s 1 -e 10 "
 prefix = 'qa'
 startnum = 0
 endnum = 0
@@ -19,11 +24,7 @@ opts = GetoptLong.new(
 )
 
 unless ARGV.length > 0
-  puts "Usage: -u <start url>
-   -p <prefix>
-   -s <starting index>
-   -e <ending index>
-e.g. ruby #{$0} -u http://www.yahoo.com -p qa -s 1 -e 10 "
+  puts usage
   Process.exit!
 end
 
@@ -39,11 +40,7 @@ begin
     when "--endnum"
       endnum = arg.to_i
     else
-      puts "Usage: -u <start url>
-   -p <prefix>
-   -s <starting index>
-   -e <ending index>
-e.g. ruby $0 -u http://www.yahoo.com -p qa -s 1 -e 10 "
+      puts usage
       Process.exit!
     end
   }
