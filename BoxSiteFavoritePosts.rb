@@ -5,42 +5,44 @@ require 'BoxSiteHelperModule.rb'
 include BoxSiteHelperModule
 
 # init
+usage = "Usage: -a email address to login with
+   -u base url
+   -P password
+  e.g. ruby #{$0} -a qa42@powered.com -P password"
+url = ''
 emailaddress = "foo@bar.com"
-password = "password"
+password = "boguspassword"
 
 # process command line options
 opts = GetoptLong.new(
-    [ "--emailaddress", "-a", GetoptLong::OPTIONAL_ARGUMENT ],
-    [ "--password", "-P", GetoptLong::OPTIONAL_ARGUMENT ]
+    [ "--url", "-u", GetoptLong::REQUIRED_ARGUMENT ],
+    [ "--emailaddress", "-a", GetoptLong::REQUIRED_ARGUMENT ],
+    [ "--password", "-P", GetoptLong::REQUIRED_ARGUMENT ]
 )
 
 unless ARGV.length > 0
-  puts 'Usage: -a email address to login with
-   -P passowrd
-  e.g. ruby <scriptname> -a qa42@powered.com -P password'
+  puts usage
   exit
 end
 
 begin
   opts.each { |opt, arg|
     case opt
+    when "--url"
+      url = arg
     when "--emailaddress"
       emailaddress = arg
     when "--password"
       password = arg
     else
-      puts 'Usage: -c list of clients
-   -e environment
-   -R Resume previous run
-   -n Skip registration of new user before spidering registration
-e.g. ruby start_watir_spider.rb -c sony, motorola -e QA, ClientQA '
+      puts usage
       Process.exit!
     end
   }
 end
 
 # create instance of selenium client
-selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", "http://appcert01-rons.eng.powered.com:8075/", 10000);
+selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", url, 10000);
 selenium.start
 selenium.set_context("test_box_site_favorite_topic")
 
@@ -50,20 +52,10 @@ if selenium.element? "link=Logout"
   selenium.click "link=Logout"
   selenium.wait_for_page_to_load "30"
 end
-selenium.open "/login"
-selenium.wait_for_page_to_load "30000"
-if (selenium.element? "emailAddress") && (selenium.element? "LoginSubmit")
-  selenium.click "emailAddress"
-  selenium.type "emailAddress", emailaddress
-  selenium.type "password", password
-  selenium.click "LoginSubmit"
-  selenium.wait_for_page_to_load "30000"
-else
-  puts "could not login!"
-end
+loginFrontendUser(selenium, emailaddress, password)
 
-# determine max page number
-maxPageNumber = 0
+# determine the max page number for the discussions tab
+maxPageNumber = 1 #there's always one page
 topicHrefs = []
 topicIds = []
 selenium.open "/discussions/home"
@@ -77,7 +69,7 @@ selenium.get_xpath_count('//a').to_i.times do |i|
     end
   end
 end
-puts maxPageNumber
+puts "maxPageNumber = #{maxPageNumber}"
 
 # now access each page and collect topics
 for i in 1..maxPageNumber.to_i
@@ -93,13 +85,13 @@ for i in 1..maxPageNumber.to_i
   end
 end
 
-# view each topic and favorit it
+# view each topic and favorite it
 topicHrefs.each do |href|
   selenium.open(href)
   if selenium.element? "//div[@class=\"userFavoriteImage \"]" 
     selenium.click "//div[@class=\"userFavoriteImage \"]"
   else
-    puts "could not favorite #{href}"
+    puts "ack! could not favorite #{href}"
   end
 end
 
