@@ -18,6 +18,11 @@ module BoxSiteHelperModule
         puts "could not find login fields!"
         Process.exit!
     end
+    # verify login
+    unless (seleniumObject.element? "Logout")
+        puts "login unsuccessful!"
+          Process.exit!
+    end
   end
 
  

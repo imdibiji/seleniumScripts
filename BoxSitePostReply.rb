@@ -73,17 +73,7 @@ if selenium.element? "link=Logout"
   selenium.click "link=Logout"
   selenium.wait_for_page_to_load "30"
 end
-selenium.open "/login"
-selenium.wait_for_page_to_load "30000"
-if (selenium.element? "emailAddress") && (selenium.element? "LoginSubmit")
-  selenium.click "emailAddress"
-  selenium.type "emailAddress", emailaddress
-  selenium.type "password", password
-  selenium.click "LoginSubmit"
-  selenium.wait_for_page_to_load "30000"
-else
-  puts "could not find login fields!"
-end
+loginFrontendUser(selenium, emailaddress, password)
 
 #check for successful login
 unless (selenium.element? "Logout")
