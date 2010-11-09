@@ -5,14 +5,22 @@ require 'BoxSiteHelperModule.rb'
 include BoxSiteHelperModule
 
 # init
+url = ''
 prefix = 'qa'
 endnum = 0
 emailaddress = "foo@bar.com"
 password = "password"
 categories = ['Questions','Random Talk','Getting Started']
+usage = "Usage: -p <prefix to use>
+   -u base url
+   -e ending index
+   -a email address to login with
+   -P password
+  e.g. ruby #{$0} -u http://appcert01-sony.eng.powered.com:8072/ -p \"this is a test\" -e 10 -a qa42@powered.com -P password"
 
 # process command line options
 opts = GetoptLong.new(
+    [ "--url", "-u", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--prefix", "-p", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--endnum", "-e", GetoptLong::REQUIRED_ARGUMENT ],
     [ "--emailaddress", "-a", GetoptLong::REQUIRED_ARGUMENT ],
@@ -20,17 +28,15 @@ opts = GetoptLong.new(
 )
 
 unless ARGV.length > 0
-  puts "Usage: -p <prefix to use>
-   -e ending index
-   -a email address to login with
-   -P passowrd
-  e.g. ruby #{$0} -p \"this is a test\" -s 1 -e 10 -a qa42@powered.com -P password"
+  puts usage
   exit
 end
 
 begin
   opts.each { |opt, arg|
     case opt
+    when "--url"
+      url = arg
     when "--prefix"
       prefix = arg
     when "--endnum"
@@ -40,18 +46,14 @@ begin
     when "--password"
       password = arg
     else
-      puts 'Usage: -c list of clients
-   -e environment
-   -R Resume previous run
-   -n Skip registration of new user before spidering registration
-e.g. ruby start_watir_spider.rb -c sony, motorola -e QA, ClientQA '
+      puts usage
       Process.exit!
     end
   }
 end
 
 # create instance of selenium client
-selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", "http://appcert01-rons.eng.powered.com:8075/", 10000);
+selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*chrome", url, 10000);
 selenium.start
 selenium.allow_native_xpath("false")
 selenium.set_context("test_box_site_post_topic")
